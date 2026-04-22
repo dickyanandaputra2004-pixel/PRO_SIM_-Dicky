@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>SIM DICKY - INSTIPER GIS</title>
+
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css"/>
+<script src="https://cdn.jsdelivr.net/npm/@turf/turf@6/turf.min.js"></script>
+
+<style>
+body { margin:0; font-family:Segoe UI; }
+
+#header{
+  background:#111;
+  color:white;
+  padding:12px;
+  text-align:center;
+  font-weight:bold;
+}
+
+#map{ height:92vh; }
+</style>
+</head>
+
+<body>
+
+<div id="header">🌍 SIM DICKY - INSTIPER GIS (SATELLITE REAL DATA)</div>
+<div id="map"></div>
+
+<script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
+
+<script>
+
+// =====================
+// MAP
+// =====================
+var map = L.map('map').setView([-7.7619, 110.4096], 18);
+
+// SATELLITE (REALISTIC EARTH VIEW)
+L.tileLayer(
+'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+{ attribution:'ESRI Satellite' }
+).addTo(map);
+
+// =====================
+// LUAS (GIS REAL - TURF.JS)
+// =====================
+function luas(coords){
+
+  let poly = turf.polygon([coords.map(p => [p[1], p[0]])]);
+
+  let area = turf.area(poly);
+
+  return Math.round(area);
+}
+
+// =====================
+// GEDUNG FUNCTION
+// =====================
+function gedung(layer,nama,warna,coords){
+
+  let p = L.polygon(coords,{
+    color:"#fff",
+    weight:1,
+    fillColor:warna,
+    fillOpacity:0.35
+  }).addTo(layer);
+
+  let center = p.getBounds().getCenter();
+
+  L.circleMarker(center,{
+    radius:3,
+    color:"#000",
+    fillColor:"#fff",
+    fillOpacity:1
+  }).addTo(layer);
+
+  p.bindPopup(
+    "<b>"+nama+"</b><br>Luas: "+luas(coords)+" m²"
+  );
+}
+
+// =====================
+// LAYERS INSTIPER
+// =====================
+var fakultas = L.layerGroup();
+var fasilitas = L.layerGroup();
+var umum = L.layerGroup();
+var jalan = L.layerGroup();
+
+// =====================
+// FAKULTAS INSTIPER
+// =====================
+
+// FAKULTAS PERTANIAN
+gedung(fakultas,"Fakultas Pertanian INSTIPER","#2ecc71",[
+[-7.76185,110.40930],
+[-7.76185,110.40955],
+[-7.76165,110.40955],
+[-7.76165,110.40930]
+]);
+
+// FAKULTAS KEHUTANAN
+gedung(fakultas,"Fakultas Kehutanan INSTIPER","#27ae60",[
+[-7.76205,110.40920],
+[-7.76205,110.40945],
+[-7.76185,110.40945],
+[-7.76185,110.40920]
+]);
+
+// TEKNOLOGI PERTANIAN
+gedung(fakultas,"Teknologi Pertanian INSTIPER","#16a085",[
+[-7.76170,110.40960],
+[-7.76170,110.40985],
+[-7.76150,110.40985],
+[-7.76150,110.40960]
+]);
+
+// =====================
+// GEDUNG UTAMA INSTIPER
+// =====================
+
+gedung(umum,"Rektorat INSTIPER","#e74c3c",[
+[-7.76195,110.40940],
+[-7.76195,110.40965],
+[-7.76175,110.40965],
+[-7.76175,110.40940]
+]);
+
+gedung(umum,"Perpustakaan INSTIPER","#f39c12",[
+[-7.76160,110.40970],
+[-7.76160,110.40995],
+[-7.76140,110.40995],
+[-7.76140,110.40970]
+]);
+
+gedung(umum,"Auditorium INSTIPER","#c0392b",[
+[-7.76215,110.40975],
+[-7.76215,110.41005],
+[-7.76195,110.41005],
+[-7.76195,110.40975]
+]);
+
+// =====================
+// FASILITAS INSTIPER
+// =====================
+
+gedung(fasilitas,"Kantin INSTIPER","#f1c40f",[
+[-7.76150,110.40910],
+[-7.76150,110.40930],
+[-7.76130,110.40930],
+[-7.76130,110.40910]
+]);
+
+gedung(fasilitas,"Masjid INSTIPER","#3498db",[
+[-7.76180,110.40910],
+[-7.76180,110.40930],
+[-7.76160,110.40930],
+[-7.76160,110.40910]
+]);
+
+gedung(fasilitas,"Parkiran INSTIPER","#95a5a6",[
+[-7.76165,110.40915],
+[-7.76165,110.40935],
+[-7.76135,110.40935],
+[-7.76135,110.40915]
+]);
+
+// =====================
+// JALAN INSTIPER
+// =====================
+L.polyline([
+[-7.76220,110.40910],
+[-7.76120,110.40910],
+[-7.76120,110.41010]
+],{color:"white",weight:3}).addTo(jalan);
+
+L.polyline([
+[-7.76210,110.40950],
+[-7.76130,110.40950]
+],{color:"white",weight:2}).addTo(jalan);
+
+// =====================
+// ADD TO MAP
+// =====================
+fakultas.addTo(map);
+fasilitas.addTo(map);
+umum.addTo(map);
+jalan.addTo(map);
+
+// =====================
+// LAYER CONTROL
+// =====================
+L.control.layers(
+{},
+{
+"Fakultas INSTIPER": fakultas,
+"Fasilitas INSTIPER": fasilitas,
+"Gedung Utama INSTIPER": umum,
+"Jalan INSTIPER": jalan
+}
+).addTo(map);
+
+</script>
+
+</body>
+</html>
